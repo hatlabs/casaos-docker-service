@@ -1,0 +1,39 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    purge)
+        # Stop the CasaOS service
+        systemctl stop casaos.service || true
+        systemctl disable casaos.service || true
+
+        # Stop all containers except the CasaOS container itself
+        # This stops containers managed by CasaOS before we remove their data
+        docker ps -q --filter "name=^(?!casa$)" | xargs -r docker stop || true
+
+        # Stop the CasaOS container
+        cd /opt/casa && docker compose down -v || true
+
+        # Remove /opt/casa directory and all container data
+        rm -rf /opt/casa
+
+        # Reload systemd daemon
+        systemctl daemon-reload || true
+        ;;
+
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        # Stop the service but keep configuration and container data
+        systemctl stop casaos.service || true
+        systemctl disable casaos.service || true
+        cd /opt/casa && docker compose down || true
+        ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

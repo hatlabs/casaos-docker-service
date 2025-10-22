@@ -1,0 +1,22 @@
+Source: casaos-docker-service
+Section: admin
+Priority: optional
+Maintainer: Hat Labs <info@hatlabs.fi>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/hatlabs/casaos-docker-service
+
+Package: casaos-docker-service
+Architecture: all
+Depends: ${misc:Depends}, docker.io, docker-compose-v2
+Description: CasaOS containerized service for HaLOS
+ CasaOS provides a user-friendly web interface for managing Docker
+ containers. This package installs CasaOS as a containerized service
+ using Docker Compose.
+ .
+ CasaOS runs in a Docker container and provides:
+  - Container management through web UI
+  - App store functionality
+  - Simple Docker management for non-technical users
+ .
+ The web interface is accessible on port 80 after installation.

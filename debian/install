@@ -1,0 +1,2 @@
+docker-compose.yml opt/casa/
+casaos.service lib/systemd/system/

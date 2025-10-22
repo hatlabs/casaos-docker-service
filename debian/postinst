@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Create /opt/casa directory if it doesn't exist
+        mkdir -p /opt/casa
+
+        # Reload systemd daemon to pick up the new service
+        systemctl daemon-reload
+
+        # Enable the service to start on boot
+        systemctl enable casaos.service
+
+        # Start the service
+        systemctl start casaos.service
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
