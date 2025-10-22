@@ -1,0 +1,22 @@
+FROM debian:trixie
+
+# Install all packaging tools
+RUN apt-get update && apt-get install -y \
+    debhelper \
+    dh-make \
+    devscripts \
+    build-essential \
+    git \
+    vim \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up working directory
+WORKDIR /workspace
+
+# Optional: Add a non-root user
+RUN useradd -m -s /bin/bash builder && \
+    chown builder:builder /workspace
+USER builder
+
+CMD ["/bin/bash"]

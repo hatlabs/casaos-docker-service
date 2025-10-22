@@ -1,9 +1,10 @@
-casaos-docker-service (0.1.0) trixie; urgency=medium
+casaos-docker-service (0.4.15) trixie; urgency=medium
 
   * Initial release
-  * Docker Compose configuration for CasaOS container
+  * Docker Compose configuration for CasaOS container (dockurr/casa:0.4.15)
   * Systemd service for container lifecycle management
   * Installs to /opt/casa with persistent data storage
   * Web UI accessible on port 80
+  * Package version tracks dockurr/casa image version
 
  -- Hat Labs <info@hatlabs.fi>  Wed, 22 Oct 2025 12:00:00 +0300
