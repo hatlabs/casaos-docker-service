@@ -1,0 +1,113 @@
+name: Check for new dockurr/casa versions
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Get current version
+        id: current
+        run: |
+          CURRENT_VERSION=$(cat VERSION | tr -d '\n\r ')
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Get latest dockurr/casa version from Docker Hub
+        id: latest
+        run: |
+          # Fetch tags from Docker Hub API
+          LATEST_VERSION=$(curl -s "https://hub.docker.com/v2/repositories/dockurr/casa/tags?page_size=100" | \
+            jq -r '.results[].name' | \
+            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | \
+            sort -V | \
+            tail -n 1)
+
+          echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest version: $LATEST_VERSION"
+
+      - name: Compare versions
+        id: compare
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_needed=true" >> $GITHUB_OUTPUT
+            echo "New version available: $LATEST (current: $CURRENT)"
+          else
+            echo "update_needed=false" >> $GITHUB_OUTPUT
+            echo "Already up to date: $CURRENT"
+          fi
+
+      - name: Update VERSION file
+        if: steps.compare.outputs.update_needed == 'true'
+        run: |
+          echo "${{ steps.latest.outputs.version }}" > VERSION
+
+      - name: Update docker-compose.yml
+        if: steps.compare.outputs.update_needed == 'true'
+        run: |
+          # Update the image tag in docker-compose.yml
+          sed -i "s|image: dockurr/casa.*|image: dockurr/casa:${{ steps.latest.outputs.version }}|g" docker-compose.yml
+
+      - name: Update debian/changelog
+        if: steps.compare.outputs.update_needed == 'true'
+        run: |
+          # Install devscripts for dch command
+          sudo apt-get update
+          sudo apt-get install -y devscripts
+
+          export DEBEMAIL="info@hatlabs.fi"
+          export DEBFULLNAME="Hat Labs Bot"
+
+          # Add new changelog entry
+          dch --newversion "${{ steps.latest.outputs.version }}" \
+              --distribution trixie \
+              --force-distribution \
+              "Update to dockurr/casa ${{ steps.latest.outputs.version }}"
+
+      - name: Update .bumpversion.cfg
+        if: steps.compare.outputs.update_needed == 'true'
+        run: |
+          # Update current_version in .bumpversion.cfg
+          sed -i "s/current_version = .*/current_version = ${{ steps.latest.outputs.version }}/g" .bumpversion.cfg
+
+      - name: Create Pull Request
+        if: steps.compare.outputs.update_needed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update dockurr/casa to version ${{ steps.latest.outputs.version }}"
+          branch: update-casa-${{ steps.latest.outputs.version }}
+          delete-branch: true
+          title: "Update dockurr/casa to version ${{ steps.latest.outputs.version }}"
+          body: |
+            ## Automated Version Update
+
+            A new version of `dockurr/casa` has been detected on Docker Hub.
+
+            **Current version:** ${{ steps.current.outputs.version }}
+            **New version:** ${{ steps.latest.outputs.version }}
+
+            ### Changes
+            - Updated `VERSION` file
+            - Updated `docker-compose.yml` image tag
+            - Updated `debian/changelog` with new entry
+            - Updated `.bumpversion.cfg` current_version
+
+            ### Docker Hub
+            [View release on Docker Hub](https://hub.docker.com/r/dockurr/casa/tags?name=${{ steps.latest.outputs.version }})
+
+            ---
+            *This PR was automatically created by the update-casa-version workflow.*
+          labels: |
+            automated
+            dependencies

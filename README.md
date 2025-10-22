@@ -55,3 +55,19 @@ CasaOS stores its data in `/opt/casa/`, which is mounted as a bind mount into th
 ## Docker Socket Access
 
 The CasaOS container has access to the Docker socket (`/var/run/docker.sock`), allowing it to manage other containers on the host system.
+
+## Automated Version Updates
+
+This repository includes a nightly workflow that checks for new versions of the `dockurr/casa` Docker image on Docker Hub. When a new version is detected, the workflow automatically:
+
+1. Updates the `VERSION` file
+2. Updates the image tag in `docker-compose.yml`
+3. Adds a new entry to `debian/changelog`
+4. Updates `.bumpversion.cfg`
+5. Creates a Pull Request with all changes
+
+The workflow runs:
+- **Nightly** at 2 AM UTC
+- **Manually** via workflow dispatch in GitHub Actions
+
+This ensures the package stays in sync with upstream releases.
