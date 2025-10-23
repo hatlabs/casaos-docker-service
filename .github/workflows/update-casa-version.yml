@@ -68,8 +68,8 @@ jobs:
           export DEBEMAIL="info@hatlabs.fi"
           export DEBFULLNAME="Hat Labs Bot"
 
-          # Add new changelog entry
-          dch --newversion "${{ steps.latest.outputs.version }}" \
+          # Add new changelog entry with -1 Debian revision
+          dch --newversion "${{ steps.latest.outputs.version }}-1" \
               --distribution trixie \
               --force-distribution \
               "Update to dockurr/casa ${{ steps.latest.outputs.version }}"
