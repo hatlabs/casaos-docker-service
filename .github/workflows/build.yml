@@ -10,10 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Read version from VERSION file
+    - name: Read version from debian/changelog
       id: version
       run: |
-        VERSION=$(cat VERSION | tr -d '\n\r ')
+        # Extract version from first line of debian/changelog (includes Debian revision)
+        VERSION=$(dpkg-parsechangelog -S Version)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Found version: $VERSION"
 
