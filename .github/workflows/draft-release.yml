@@ -24,21 +24,39 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Found version: $VERSION"
 
-    - name: Check if release already exists
+    - name: Check if release exists and if it's published
       id: check_release
       run: |
         if gh release view "v${{ steps.version.outputs.version }}" &>/dev/null; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Release v${{ steps.version.outputs.version }} already exists"
+          # Release exists, check if it's a draft
+          IS_DRAFT=$(gh release view "v${{ steps.version.outputs.version }}" --json isDraft --jq '.isDraft')
+          if [ "$IS_DRAFT" = "true" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "delete_existing=true" >> $GITHUB_OUTPUT
+            echo "Existing draft release found - will delete and recreate"
+          else
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "delete_existing=false" >> $GITHUB_OUTPUT
+            echo "Published release v${{ steps.version.outputs.version }} already exists - skipping"
+          fi
         else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Release v${{ steps.version.outputs.version }} does not exist"
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "delete_existing=false" >> $GITHUB_OUTPUT
+          echo "No existing release found"
         fi
       env:
         GH_TOKEN: ${{ github.token }}
 
+    - name: Delete existing draft release
+      if: steps.check_release.outputs.delete_existing == 'true'
+      run: |
+        echo "Deleting existing draft release v${{ steps.version.outputs.version }}"
+        gh release delete "v${{ steps.version.outputs.version }}" --yes
+      env:
+        GH_TOKEN: ${{ github.token }}
+
     - name: Download build artifacts
-      if: steps.check_release.outputs.exists == 'false'
+      if: steps.check_release.outputs.skip == 'false'
       uses: actions/download-artifact@v4
       with:
         name: debian-packages-${{ steps.version.outputs.version }}
@@ -47,7 +65,7 @@ jobs:
         run-id: ${{ github.event.workflow_run.id }}
 
     - name: Create draft release
-      if: steps.check_release.outputs.exists == 'false'
+      if: steps.check_release.outputs.skip == 'false'
       run: |
         # Extract the latest changelog entry
         CHANGELOG_ENTRY=$(sed -n '/^casaos-docker-service ('${{ steps.version.outputs.version }}'/,/^casaos-docker-service ([0-9]/p' debian/changelog | sed '$d')
