@@ -1,0 +1,81 @@
+name: draft-release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  create-draft-release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Read version from VERSION file
+      id: version
+      run: |
+        VERSION=$(cat VERSION | tr -d '\n\r ')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Found version: $VERSION"
+
+    - name: Check if release already exists
+      id: check_release
+      run: |
+        if gh release view "v${{ steps.version.outputs.version }}" &>/dev/null; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Release v${{ steps.version.outputs.version }} already exists"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Release v${{ steps.version.outputs.version }} does not exist"
+        fi
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    - name: Create draft release
+      if: steps.check_release.outputs.exists == 'false'
+      run: |
+        # Extract the latest changelog entry
+        CHANGELOG_ENTRY=$(sed -n '/^casaos-docker-service ('${{ steps.version.outputs.version }}'/,/^casaos-docker-service ([0-9]/p' debian/changelog | sed '$d')
+
+        # Create release notes
+        cat > release_notes.md <<EOF
+        ## CasaOS Docker Service v${{ steps.version.outputs.version }}
+
+        This release packages the dockurr/casa Docker image as a systemd service for easy installation on Debian-based systems.
+
+        ### Changelog
+
+        \`\`\`
+        ${CHANGELOG_ENTRY}
+        \`\`\`
+
+        ### Installation
+
+        Download the .deb package from the build artifacts and install with:
+
+        \`\`\`bash
+        sudo dpkg -i casaos-docker-service_${{ steps.version.outputs.version }}_all.deb
+        sudo apt-get install -f  # Install any missing dependencies
+        \`\`\`
+
+        The service will be automatically started and enabled. Access CasaOS at http://localhost:80
+
+        ### What's Included
+
+        - Docker Compose configuration for dockurr/casa:${{ steps.version.outputs.version }}
+        - Systemd service unit for automatic startup
+        - Configuration stored in /opt/casa
+        EOF
+
+        gh release create "v${{ steps.version.outputs.version }}" \
+          --draft \
+          --title "v${{ steps.version.outputs.version }}" \
+          --notes-file release_notes.md
+
+        echo "Created draft release v${{ steps.version.outputs.version }}"
+      env:
+        GH_TOKEN: ${{ github.token }}
