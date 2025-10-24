@@ -1,18 +1,18 @@
 # CasaOS Docker Service
 
-This repository contains the CasaOS containerized deployment configuration for HaLOS. For the overall project architecture, see [../CLAUDE.md](../CLAUDE.md).
+This repository contains the CasaOS containerized deployment configuration for Halos. For the overall project architecture, see [../CLAUDE.md](../CLAUDE.md).
 
 ## Overview
 
-CasaOS is a user-friendly web interface for managing Docker containers and applications. In HaLOS, it provides:
+CasaOS is a user-friendly web interface for managing Docker containers and applications. In Halos, it provides:
 - Container management and monitoring
 - App store interface (with marine apps in marine variants)
 - Simple web UI accessible on port 80/443
 - Easy installation of additional services
 
-## Integration with HaLOS
+## Integration with Halos
 
-CasaOS is installed in all HaLOS variants via the `stage-halos-base/` stage during image building. See [../halos-pi-gen/CLAUDE.md](../halos-pi-gen/CLAUDE.md) for build system details.
+CasaOS is installed in all Halos variants via the `stage-halos-base/` stage during image building. See [../halos-pi-gen/CLAUDE.md](../halos-pi-gen/CLAUDE.md) for build system details.
 
 ### Installation Location
 - Installed during: `stage-halos-base/01-install-casaos/`
@@ -30,7 +30,7 @@ CasaOS configuration files are deployed during the image build process. Key conf
 
 ### Modifying CasaOS Configuration
 
-To change how CasaOS is configured in HaLOS images:
+To change how CasaOS is configured in Halos images:
 
 1. Navigate to `halos-pi-gen/stage-halos-base/01-install-casaos/`
 2. Edit task scripts or configuration files
@@ -45,7 +45,7 @@ CasaOS changes can be tested by:
 
 ## App Store Integration
 
-Marine variants of HaLOS include a custom app store with curated marine applications. See [../casaos-marine-store/CLAUDE.md](../casaos-marine-store/CLAUDE.md) for details on the marine app store.
+Marine variants of Halos include a custom app store with curated marine applications. See [../casaos-marine-store/CLAUDE.md](../casaos-marine-store/CLAUDE.md) for details on the marine app store.
 
 ## Common Tasks
 

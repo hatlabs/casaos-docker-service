@@ -9,7 +9,7 @@ Homepage: https://github.com/hatlabs/casaos-docker-service
 Package: casaos-docker-service
 Architecture: all
 Depends: ${misc:Depends}, docker-ce-cli, docker-compose-plugin
-Description: CasaOS containerized service for HaLOS
+Description: CasaOS containerized service for Halos
  CasaOS provides a user-friendly web interface for managing Docker
  containers. This package installs CasaOS as a containerized service
  using Docker Compose.
