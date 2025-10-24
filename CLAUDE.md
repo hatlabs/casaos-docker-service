@@ -2,6 +2,14 @@
 
 This repository contains the CasaOS containerized deployment configuration for Halos. For the overall project architecture, see [../CLAUDE.md](../CLAUDE.md).
 
+## Git Workflow Policy
+
+**IMPORTANT:** Always ask the user before:
+- Committing files to git
+- Pushing commits to remote repositories
+- Creating or modifying git tags
+- Running destructive git operations
+
 ## Overview
 
 CasaOS is a user-friendly web interface for managing Docker containers and applications. In Halos, it provides:
