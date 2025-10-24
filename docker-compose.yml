@@ -5,7 +5,8 @@ services:
     ports:
       - 80:8080
     volumes:
-      - /opt/casa:/DATA
+      - /opt/casa/casa:/DATA
+      - /opt/casa/casa/app-management.conf:/etc/casaos/app-management.conf
       - /var/run/docker.sock:/var/run/docker.sock
     restart: "no"
     stop_grace_period: 1m

@@ -1,2 +1,3 @@
 docker-compose.yml opt/casa/
+app-management.conf opt/casa/casa/
 casaos.service lib/systemd/system/
