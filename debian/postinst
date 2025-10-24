@@ -4,7 +4,7 @@ set -e
 case "$1" in
     configure)
         # Create /opt/casa directory if it doesn't exist
-        mkdir -p /opt/casa
+        mkdir -p /opt/casa/casa
 
         # Reload systemd daemon to pick up the new service
         systemctl daemon-reload
