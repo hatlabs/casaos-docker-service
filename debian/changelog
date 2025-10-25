@@ -1,3 +1,12 @@
+casaos-docker-service (0.4.15-2) trixie; urgency=medium
+
+  * Add MIT License for packaging infrastructure
+  * Generalize documentation by removing Halos-specific references
+  * Expand CLAUDE.md with comprehensive development and debugging guide
+  * Clarify licensing distinction between packaging (MIT) and CasaOS (Apache-2.0)
+
+ -- Hat Labs <info@hatlabs.fi>  Sat, 25 Oct 2025 15:00:00 +0300
+
 casaos-docker-service (0.4.15-1) trixie; urgency=medium
 
   * Fix package dependencies (docker-ce-cli, docker-compose-v2)
