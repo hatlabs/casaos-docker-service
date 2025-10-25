@@ -1,6 +1,6 @@
 # casaos-docker-service
 
-Halos includes CasaOS as a core component for managing Docker containers through a user-friendly web interface. As opposed to the standard CasaOS installation, CasaOS is run in a Docker container itself, allowing for easier updates and isolation from the host system. This repository contains the Docker service configuration and compose files needed to deploy CasaOS on Halos as well as Debian packaging to facilitate installation and management of the service.
+Debian packaging for CasaOS, a user-friendly web interface for managing Docker containers. Unlike the standard CasaOS installation, this deployment runs CasaOS in a Docker container itself, allowing for easier updates and isolation from the host system. This repository contains the Docker service configuration and compose files needed to deploy CasaOS, as well as Debian packaging to facilitate installation and management of the service.
 
 ## Files
 
@@ -71,3 +71,20 @@ The workflow runs:
 - **Manually** via workflow dispatch in GitHub Actions
 
 This ensures the package stays in sync with upstream releases.
+
+## License
+
+This packaging repository (build scripts, Debian packaging files, systemd service, documentation) is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+**Important:** CasaOS itself is licensed under the **Apache-2.0 License**. When you install this package, you receive:
+- The packaging infrastructure (MIT) - created by Hat Labs
+- CasaOS software (Apache-2.0) - created by the CasaOS/IceWhale project
+
+Users of the installed software are bound by CasaOS's Apache-2.0 license for the CasaOS application itself.
+
+## Links
+
+- **CasaOS Project**: https://github.com/IceWhaleTech/CasaOS
+- **CasaOS Documentation**: https://casaos.io/
+- **Docker Image**: https://hub.docker.com/r/dockurr/casa
+- **This Packaging Repository**: https://github.com/hatlabs/casaos-docker-service
